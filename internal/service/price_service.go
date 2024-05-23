@@ -11,28 +11,28 @@ type PriceProvider interface {
 	GetLastTradedPrice(pair string) (float64, error)
 }
 
-type PriceService struct {
-	krakenClient kraken.TickerClient
+type KrakenPriceService struct {
+	krakenClient kraken.KrakenTickerClient
 	cacheClient  cache.CacheClient
 }
 
-func NewPriceService(kc kraken.TickerClient, cc cache.CacheClient) *PriceService {
-	return &PriceService{
+func NewPriceService(kc kraken.KrakenTickerClient, cc cache.CacheClient) *KrakenPriceService {
+	return &KrakenPriceService{
 		krakenClient: kc,
 		cacheClient:  cc,
 	}
 }
 
-func (ps *PriceService) GetLastTradedPrices(pairs []string) ([]map[string]string, error) {
+func (kps *KrakenPriceService) GetLastTradedPrices(pairs []string) ([]map[string]string, error) {
 
 	cacheKey := fmt.Sprintf("ltp:%d", time.Now().Unix()/60) // this way we cache the results for the current minute, different from storing the results for 60 seconds.
-	if prices, found := ps.cacheClient.Get(cacheKey); found {
+	if prices, found := kps.cacheClient.Get(cacheKey); found {
 		return prices, nil
 	}
 
 	var results []map[string]string
 	for _, pair := range pairs {
-		ticker, err := ps.krakenClient.GetTicker(pair)
+		ticker, err := kps.krakenClient.GetTicker(pair)
 		if err != nil {
 			return nil, err
 		}
@@ -46,7 +46,7 @@ func (ps *PriceService) GetLastTradedPrices(pairs []string) ([]map[string]string
 		}
 	}
 
-	ps.cacheClient.Set(cacheKey, results, 60*time.Second)
+	kps.cacheClient.Set(cacheKey, results, 60*time.Second) // the ttl is just for cleaning up the cache
 
 	return results, nil
 }

@@ -1,5 +1,5 @@
 package kraken
 
-type TickerClient interface {
-	GetTicker(pair string) (TickerResponse, error)
+type KrakenTickerClient interface {
+	GetTicker(pair string) (KrakenTickerResponse, error)
 }

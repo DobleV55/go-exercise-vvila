@@ -13,8 +13,12 @@ import (
 func main() {
 	redisClient := cache.NewRedisClient("localhost:6379")
 	krakenClient := kraken.NewKrakenClient()
-	priceService := service.NewPriceService(krakenClient, redisClient)
+	krakenService := service.NewPriceService(krakenClient, redisClient)
 
-	http.HandleFunc("/api/v1/ltp", api.GetLTPHandler(priceService))
+	services := []service.PriceServiceInterface{krakenService}
+	averageService := service.NewAverageService(services)
+
+	http.HandleFunc("/api/v1/ltp", api.GetLTPHandler(krakenService))
+	http.HandleFunc("/api/v1/average", api.GetAveragePriceHandler(averageService)) // It might be slower, but it's more "accurate" when prices fluctuate a lot.s
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

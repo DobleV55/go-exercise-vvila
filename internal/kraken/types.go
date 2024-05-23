@@ -1,6 +1,6 @@
 package kraken
 
-type TickerResponse struct {
+type KrakenTickerResponse struct {
 	Result map[string]struct {
 		LastTradeClosed []string `json:"c"`
 	} `json:"result"`

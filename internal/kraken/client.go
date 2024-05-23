@@ -14,18 +14,18 @@ func NewKrakenClient() *KrakenClient {
 	return &KrakenClient{}
 }
 
-func (kc *KrakenClient) GetTicker(pair string) (TickerResponse, error) {
+func (kc *KrakenClient) GetTicker(pair string) (KrakenTickerResponse, error) {
 	url := fmt.Sprintf(baseUrl, pair)
 	resp, err := http.Get(url)
 	if err != nil {
-		return TickerResponse{}, err
+		return KrakenTickerResponse{}, err
 	}
 	defer resp.Body.Close()
 
-	var tickerResp TickerResponse
+	var tickerResp KrakenTickerResponse
 	err = json.NewDecoder(resp.Body).Decode(&tickerResp)
 	if err != nil {
-		return TickerResponse{}, err
+		return KrakenTickerResponse{}, err
 	}
 	return tickerResp, nil
 }
