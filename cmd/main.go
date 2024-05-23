@@ -1,6 +1,7 @@
 package main
 
 import (
+	"go-exercise-vvila/internal/blockchain"
 	"log"
 	"net/http"
 
@@ -13,12 +14,15 @@ import (
 func main() {
 	redisClient := cache.NewRedisClient("localhost:6379")
 	krakenClient := kraken.NewKrakenClient()
-	krakenService := service.NewPriceService(krakenClient, redisClient)
+	blockchainClient := blockchain.NewBlockchainClient()
 
-	services := []service.PriceServiceInterface{krakenService}
+	krakenService := service.NewPriceService(krakenClient, redisClient)
+	blockchainService := service.NewBlockchainPriceService(blockchainClient)
+
+	services := []service.PriceServiceInterface{krakenService, blockchainService}
 	averageService := service.NewAverageService(services)
 
 	http.HandleFunc("/api/v1/ltp", api.GetLTPHandler(krakenService))
-	http.HandleFunc("/api/v1/average", api.GetAveragePriceHandler(averageService)) // It might be slower, but it's more "accurate" when prices fluctuate a lot.s
+	http.HandleFunc("/api/v1/average", api.GetAveragePriceHandler(averageService)) // It might be slower, but it's more "accurate" when prices fluctuate a lot
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
