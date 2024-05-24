@@ -17,7 +17,6 @@ func (as *AverageService) GetAveragePrice(pairs []string) (map[string]float64, e
 	priceSum := make(map[string]float64)
 	priceCount := make(map[string]int)
 
-	// I would like to make this asynchronous, because if two of this services takes 2 seconds to respond, the total time would be 4 seconds.
 	for _, service := range as.services {
 		prices, err := service.GetLastTradedPrices(pairs)
 		if err != nil {

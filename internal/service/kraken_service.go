@@ -7,25 +7,21 @@ import (
 	"time"
 )
 
-type PriceProvider interface {
-	GetLastTradedPrice(pair string) (float64, error)
-}
-
-type KrakenPriceService struct {
-	krakenClient kraken.KrakenTickerClient
+type KrakenService struct {
+	krakenClient kraken.KrakenClientInterface
 	cacheClient  cache.CacheClient
 }
 
-func NewPriceService(kc kraken.KrakenTickerClient, cc cache.CacheClient) *KrakenPriceService {
-	return &KrakenPriceService{
+func NewKrakenService(kc kraken.KrakenClientInterface, cc cache.CacheClient) *KrakenService {
+	return &KrakenService{
 		krakenClient: kc,
 		cacheClient:  cc,
 	}
 }
 
-func (kps *KrakenPriceService) GetLastTradedPrices(pairs []string) ([]map[string]string, error) {
+func (kps *KrakenService) GetLastTradedPrices(pairs []string) ([]map[string]string, error) {
 
-	cacheKey := fmt.Sprintf("ltp:%d", time.Now().Unix()/60) // this way we cache the results for the current minute, different from storing the results for 60 seconds.
+	cacheKey := fmt.Sprintf("kps:%d", time.Now().Unix()/60) // this way we cache the results for the current minute, different from storing the results for 60 seconds.
 	if prices, found := kps.cacheClient.Get(cacheKey); found {
 		return prices, nil
 	}

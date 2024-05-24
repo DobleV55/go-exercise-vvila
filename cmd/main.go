@@ -12,12 +12,12 @@ import (
 )
 
 func main() {
-	redisClient := cache.NewRedisClient("localhost:6379")
+	cacheClient := cache.NewCacheClient("redis:6379")
 	krakenClient := kraken.NewKrakenClient()
 	blockchainClient := blockchain.NewBlockchainClient()
 
-	krakenService := service.NewPriceService(krakenClient, redisClient)
-	blockchainService := service.NewBlockchainPriceService(blockchainClient)
+	krakenService := service.NewKrakenService(krakenClient, cacheClient)
+	blockchainService := service.NewBlockchainService(blockchainClient, cacheClient)
 
 	services := []service.PriceServiceInterface{krakenService, blockchainService}
 	averageService := service.NewAverageService(services)

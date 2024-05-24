@@ -6,16 +6,18 @@ import (
 	"net/http"
 )
 
-const baseUrl = "https://api.kraken.com/0/public/Ticker?pair=%s"
+const BaseURL = "https://api.kraken.com/0/public/Ticker?pair=%s"
 
-type KrakenClient struct{}
+type KrakenClient struct {
+	BaseURL string
+}
 
 func NewKrakenClient() *KrakenClient {
-	return &KrakenClient{}
+	return &KrakenClient{BaseURL: BaseURL}
 }
 
 func (kc *KrakenClient) GetTicker(pair string) (KrakenTickerResponse, error) {
-	url := fmt.Sprintf(baseUrl, pair)
+	url := fmt.Sprintf(kc.BaseURL, pair)
 	resp, err := http.Get(url)
 	if err != nil {
 		return KrakenTickerResponse{}, err
